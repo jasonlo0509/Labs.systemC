@@ -1,0 +1,8 @@
+cmake_minimum_required (VERSION 2.6)
+project (adder_fifo)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+find_package(SystemC)
+include_directories(${SYSTEMC_INCLUDE_DIRS})
+add_executable(adder_fifo main.cpp)
+target_link_libraries(adder_fifo ${SYSTEMC_LIBRARIES}) 
+set_target_properties(adder_fifo PROPERTIES OUTPUT_NAME adder)

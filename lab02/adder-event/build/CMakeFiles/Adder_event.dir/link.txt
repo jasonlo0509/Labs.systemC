@@ -1,0 +1,1 @@
+/tools/linux/gnu/centos6/toolkits/bin/g++      CMakeFiles/Adder_event.dir/main.cpp.o  -o adder -rdynamic /tools/linux/gnu/centos5/systemc/lib-linux64/libsystemc.so -Wl,-rpath,/tools/linux/gnu/centos5/systemc/lib-linux64 
