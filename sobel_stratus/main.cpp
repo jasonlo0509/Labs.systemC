@@ -2,16 +2,32 @@
 #include <string>
 using namespace std;
 
+#ifndef NATIVE_SYSTEMC
+#include "esc.h"
+#endif
+
 // Wall Clock Time Measurement
 #include <sys/time.h>
 
-#include "Testbench.h"
-#include "SobelFilter.h"
+#include "System.h"
 
 // TIMEVAL STRUCT IS Defined ctime
 // use start_time and end_time variables to capture
 // start of simulation and end of simulation
 struct timeval start_time, end_time;
+
+System * sys = NULL;
+
+#ifndef NATIVE_SYSTEMC
+extern void esc_elaborate()
+{
+	sys = new System("sys", esc_argv(1), esc_argv(2));
+}
+extern void esc_cleanup()
+{
+	delete sys;
+}
+#endif
 
 // int main(int argc, char *argv[])
 int sc_main(int argc, char **argv) {
@@ -21,33 +37,22 @@ int sc_main(int argc, char **argv) {
          << endl;
     return 0;
   }
-  Testbench tb("tb");
-	SobelFilter sobel_filter("sobel_filter");
-	sc_clock clk( "clk", CLOCK_PERIOD, SC_NS );
-	sc_signal<bool> rst("rst");
-	sc_fifo<unsigned char> r;
-	sc_fifo<unsigned char> g;
-	sc_fifo<unsigned char> b;
-	sc_fifo<int> result;
-	// connect line
-	tb.i_clk(clk);
-	tb.o_rst(rst);
-	sobel_filter.i_clk(clk);
-	sobel_filter.i_rst(rst);
-	tb.o_r(r);
-	tb.o_g(g);
-	tb.o_b(b);
-	// result is the input of the testbench
-	tb.i_result(result);
-	sobel_filter.i_r(r);
-	sobel_filter.i_g(g);
-	sobel_filter.i_b(b);
-	sobel_filter.o_result(result);
-
-  tb.read_bmp(argv[1]);
+#ifndef NATIVE_SYSTEMC
+	esc_initialize(argc, argv);
+#endif
+	
+#ifndef NATIVE_SYSTEMC
+	esc_elaborate();
+#else
+	sys = new System("sys", argv[1], argv[2]);
+#endif
 	sc_start();
+#ifndef NATIVE_SYSTEMC
+	esc_cleanup();
+#else
+	delete sys;
+#endif
 	std::cout<< "Simulated time == " << sc_core::sc_time_stamp() << std::endl;
-  tb.write_bmp(argv[2]);
 
   return 0;
 }
